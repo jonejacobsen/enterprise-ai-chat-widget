@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise AI Automation Assistant</title>
+    <meta name="description" content="Create powerful business automations through natural conversation">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .chat-messages {
+            height: 450px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8fafc;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            margin-bottom: 16px;
+            max-width: 85%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            margin-right: auto;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .message-timestamp {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            margin: 60px 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border: 2px dashed #e5e7eb;
+        }
+
+        .welcome-message h3 {
+            color: #374151;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .input-wrapper {
+            position: relative;
+            max-width: 100%;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 14px 50px 14px 18px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+            resize: none;
+        }
+
+        .chat-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .chat-input:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .send-button {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            background: #5a67d8;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .send-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: translateY(-50%);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .loading.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .approval-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .approval-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 22px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .approve-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .approve-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
+        .decline-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .decline-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #ef4444;
+            font-size: 13px;
+        }
+
+        .success-message {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            border-left: 4px solid #10b981;
+            font-size: 13px;
+        }
+
+        .info-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .info-section h3 {
+            color: #1a1a1a;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-section li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-section li:last-child {
+            border-bottom: none;
+        }
+
+        .info-section li::before {
+            content: "✅ ";
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .chat-messages {
+                height: 350px;
+            }
+            
+            .approval-button {
+                min-width: 120px;
+                font-size: 12px;
+                padding: 8px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Enterprise AI Automation Assistant</h1>
+            <p>Transform your business processes into intelligent automations through natural conversation</p>
+        </div>
+
+        <div class="info-section">
+            <h3>🎯 What Can I Help You Automate?</h3>
+            <ul>
+                <li>Data synchronization between different tools and platforms</li>
+                <li>Automated notification and alert systems</li>
+                <li>Document processing and routing workflows</li>
+                <li>Report generation and distribution</li>
+                <li>API integrations and webhook connections</li>
+                <li>Scheduled tasks and monitoring systems</li>
+            </ul>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>💬 Start Your Automation Conversation</h2>
+                <div class="status-bar">
+                    <span class="status-indicator"></span>
+                    <span id="statusText">Connected & Ready</span>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="welcome-message">
+                    <h3>👋 Welcome!</h3>
+                    <p>I'm here to help you create powerful automations for your business processes.</p>
+                    <p><strong>Simply describe what you'd like to automate</strong>, and I'll analyze your request, ensure it fits within our automation scope, and guide you through the creation process.</p>
+                    <p style="margin-top: 15px; font-size: 14px; color: #667eea;">
+                        <strong>Example:</strong> "I need to sync my Google Sheets data with Slack notifications daily"
+                    </p>
+                </div>
+            </div>
+
+            <div class="loading" id="loadingIndicator">
+                <div>🤔 Analyzing your automation request...</div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        class="chat-input" 
+                        id="chatInput" 
+                        placeholder="Describe the automation you need... (e.g., sync data, send notifications, process documents)"
+                        maxlength="500"
+                    >
+                    <button class="send-button" id="sendButton" onclick="sendMessage()">
+                        ▶
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Powered by Enterprise AI Automation | Built with ❤️ for streamlined business processes</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const WEBHOOK_URL = 'https://eoih5xh2ah7kwmv.m.pipedream.net';
+        const SESSION_ID = 'github_pages_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        // State management
+        let conversationHistory = [];
+        let currentAutomationSpec = null;
+        let isProcessing = false;
+
+        // DOM elements
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const statusText = document.getElementById('statusText');
+
+        // Initialize chat
+        document.addEventListener('DOMContentLoaded', function() {
+            chatInput.focus();
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey && !isProcessing) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        function updateStatus(status, text) {
+            statusText.textContent = text;
+            const indicator = document.querySelector('.status-indicator');
+            
+            // Update indicator color based on status
+            if (status === 'processing') {
+                indicator.style.background = '#f59e0b';
+                indicator.style.animation = 'pulse 1s infinite';
+            } else if (status === 'error') {
+                indicator.style.background = '#ef4444';
+                indicator.style.animation = 'none';
+            } else {
+                indicator.style.background = '#10b981';
+                indicator.style.animation = 'pulse 2s infinite';
+            }
+        }
+
+        function addMessage(content, sender, timestamp = new Date()) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = content;
+            
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'message-timestamp';
+            timestampDiv.textContent = timestamp.toLocaleTimeString();
+            
+            messageDiv.appendChild(contentDiv);
+            messageDiv.appendChild(timestampDiv);
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addApprovalButtons(automationSpec) {
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'approval-buttons';
+            
+            const approveBtn = document.createElement('button');
+            approveBtn.className = 'approval-button approve-btn';
+            approveBtn.textContent = '✅ Yes, Create This Automation';
+            approveBtn.onclick = () => approveAutomation(automationSpec);
+            
+            const declineBtn = document.createElement('button');
+            declineBtn.className = 'approval-button decline-btn';
+            declineBtn.textContent = '❌ No, Let Me Refine';
+            declineBtn.onclick = () => declineAutomation();
+            
+            buttonsDiv.appendChild(approveBtn);
+            buttonsDiv.appendChild(declineBtn);
+            
+            // Add to last assistant message
+            const lastMessage = chatMessages.lastElementChild;
+            if (lastMessage && lastMessage.classList.contains('assistant')) {
+                lastMessage.appendChild(buttonsDiv);
+            }
+        }
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message || isProcessing) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            chatInput.value = '';
+            
+            // Update UI state
+            setProcessingState(true);
+            
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        sessionId: SESSION_ID,
+                        conversationHistory: conversationHistory,
+                        userId: 'github_pages_user_' + Date.now()
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                handleResponse(data);
+                
+                // Update conversation history
+                conversationHistory.push(
+                    { role: 'user', content: message },
+                    { role: 'assistant', content: data.message }
+                );
+
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage(
+                    `<div class="error-message">
+                        <strong>Connection Error:</strong> Unable to process your request. Please check your connection and try again.
+                        <br><small>If the problem persists, the Pipedream workflow may need to be configured.</small>
+                    </div>`, 
+                    'assistant'
+                );
+                updateStatus('error', 'Connection Error');
+            } finally {
+                setProcessingState(false);
+            }
+        }
+
+        function handleResponse(data) {
+            // Add assistant response
+            addMessage(data.message, 'assistant');
+            
+            // Handle different conversation steps
+            switch(data.conversationStep) {
+                case 'approval_required':
+                    currentAutomationSpec = data.automationSpec;
+                    addApprovalButtons(data.automationSpec);
+                    updateStatus('ready', 'Awaiting Your Approval');
+                    break;
+                
+                case 'completed':
+                    if (data.automationCreated) {
+                        addMessage(
+                            `<div class="success-message">
+                                <strong>🎉 Automation Request Created Successfully!</strong><br>
+                                Reference ID: ${data.notionRecordId}<br>
+                                <small>Your automation will be built and deployed within 2-5 business days.</small>
+                            </div>`, 
+                            'assistant'
+                        );
+                        updateStatus('ready', 'Automation Created Successfully!');
+                    }
+                    break;
+                
+                case 'error':
+                    addMessage(
+                        `<div class="error-message">
+                            <strong>Processing Error:</strong> ${data.error || 'Unknown error occurred'}
+                        </div>`, 
+                        'assistant'
+                    );
+                    updateStatus('error', 'Processing Error');
+                    break;
+                
+                default:
+                    updateStatus('ready', 'Connected & Ready');
+                    break;
+            }
+        }
+
+        async function approveAutomation(automationSpec) {
+            if (isProcessing) return;
+            
+            // Remove approval buttons
+            const approvalButtons = document.querySelector('.approval-buttons');
+            if (approvalButtons) {
+                approvalButtons.remove();
+            }
+            
+            // Add approval message
+            addMessage('✅ Yes, please create this automation!', 'user');
+            
+            setProcessingState(true);
+            
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'APPROVAL_CONFIRMED',
+                        sessionId: SESSION_ID,
+                        approval: true,
+                        automationSpec: automationSpec,
+                        conversationHistory: conversationHistory
+                    })
+                });
+
+                const data = await response.json();
+                handleResponse(data);
+
+            } catch (error) {
+                console.error('Approval error:', error);
+                addMessage(
+                    `<div class="error-message">
+                        <strong>Error:</strong> Failed to process approval. Please try again.
+                    </div>`, 
+                    'assistant'
+                );
+                updateStatus('error', 'Approval Failed');
+            } finally {
+                setProcessingState(false);
+            }
+        }
+
+        function declineAutomation() {
+            // Remove approval buttons
+            const approvalButtons = document.querySelector('.approval-buttons');
+            if (approvalButtons) {
+                approvalButtons.remove();
+            }
+            
+            addMessage('❌ Let me refine my requirements', 'user');
+            addMessage('No problem! Please tell me more about what you\'d like to change or clarify about your automation needs.', 'assistant');
+            
+            currentAutomationSpec = null;
+            updateStatus('ready', 'Ready for Refinement');
+        }
+
+        function setProcessingState(processing) {
+            isProcessing = processing;
+            chatInput.disabled = processing;
+            sendButton.disabled = processing;
+            
+            if (processing) {
+                loadingIndicator.classList.add('show');
+                updateStatus('processing', 'Processing Your Request...');
+                chatInput.placeholder = 'Please wait...';
+            } else {
+                loadingIndicator.classList.remove('show');
+                updateStatus('ready', 'Connected & Ready');
+                chatInput.placeholder = 'Describe the automation you need...';
+                chatInput.focus();
+            }
+        }
+
+        // Add some helpful keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Focus input when typing (unless in input already)
+            if (e.target !== chatInput && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+                chatInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
