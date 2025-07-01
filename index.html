@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise AI Automation Assistant</title>
-    <meta name="description" content="Create powerful business automations through natural conversation">
+    <title>Enterprise AI Automation Assistant - DEBUG</title>
     <style>
+        /* Keep all your existing CSS - I'm only adding debug styles */
         * {
             margin: 0;
             padding: 0;
@@ -19,6 +19,51 @@
             line-height: 1.6;
         }
 
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            max-height: 400px;
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            overflow-y: auto;
+            z-index: 9999;
+            border: 2px solid #333;
+        }
+
+        .debug-panel h4 {
+            color: #00ffff;
+            margin-bottom: 5px;
+        }
+
+        .debug-entry {
+            margin-bottom: 5px;
+            padding: 2px;
+            border-left: 2px solid #666;
+            padding-left: 5px;
+        }
+
+        .debug-entry.error {
+            border-left-color: #ff0000;
+            color: #ffaaaa;
+        }
+
+        .debug-entry.success {
+            border-left-color: #00ff00;
+            color: #aaffaa;
+        }
+
+        .debug-entry.info {
+            border-left-color: #0088ff;
+            color: #aaccff;
+        }
+
+        /* Your existing styles continue here... */
         .container {
             max-width: 900px;
             margin: 0 auto;
@@ -50,6 +95,7 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             margin-bottom: 30px;
+            margin-right: 320px; /* Make room for debug panel */
         }
 
         .chat-header {
@@ -341,38 +387,18 @@
             color: #666;
             font-size: 14px;
         }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .chat-messages {
-                height: 350px;
-            }
-            
-            .approval-button {
-                min-width: 120px;
-                font-size: 12px;
-                padding: 10px 16px;
-                flex-direction: column;
-            }
-            
-            .approval-buttons {
-                flex-direction: column;
-            }
-        }
     </style>
 </head>
 <body>
+    <!-- DEBUG PANEL -->
+    <div class="debug-panel" id="debugPanel">
+        <h4>🔍 DEBUG CONSOLE</h4>
+        <div id="debugLog"></div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h1>🤖 Enterprise AI Automation Assistant</h1>
+            <h1>🤖 Enterprise AI Automation Assistant - DEBUG</h1>
             <p>Transform your business processes into intelligent automations through natural conversation</p>
         </div>
 
@@ -399,7 +425,7 @@
 
             <div class="chat-messages" id="chatMessages">
                 <div class="welcome-message">
-                    <h3>👋 Welcome!</h3>
+                    <h3>👋 Welcome to DEBUG Mode!</h3>
                     <p>I'm here to help you create powerful automations for your business processes.</p>
                     <p><strong>Simply describe what you'd like to automate</strong>, and I'll analyze your request, ensure it fits within our automation scope, and guide you through the creation process.</p>
                     <p style="margin-top: 15px; font-size: 14px; color: #667eea;">
@@ -429,15 +455,28 @@
         </div>
 
         <div class="footer">
-            <p>Powered by Enterprise AI Automation | Built with ❤️ for streamlined business processes</p>
+            <p>Powered by Enterprise AI Automation | Built with ❤️ for streamlined business processes | DEBUG MODE</p>
         </div>
     </div>
 
     <script>
         // Configuration
         const WEBHOOK_URL = 'https://eoih5xh2ah7kwmv.m.pipedream.net';
-        const SESSION_ID = 'github_pages_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        const SESSION_ID = 'debug_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         
+        // Debug logging
+        function debugLog(message, type = 'info') {
+            const debugPanel = document.getElementById('debugLog');
+            const entry = document.createElement('div');
+            entry.className = `debug-entry ${type}`;
+            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugPanel.appendChild(entry);
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+            
+            // Also log to browser console
+            console.log(`[DEBUG] ${message}`);
+        }
+
         // State management
         let conversationHistory = [];
         let currentAutomationSpec = null;
@@ -452,6 +491,7 @@
 
         // Initialize chat
         document.addEventListener('DOMContentLoaded', function() {
+            debugLog('🚀 Widget initialized', 'success');
             chatInput.focus();
             chatInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey && !isProcessing) {
@@ -465,7 +505,8 @@
             statusText.textContent = text;
             const indicator = document.querySelector('.status-indicator');
             
-            // Update indicator color based on status
+            debugLog(`📊 Status update: ${status} - ${text}`, 'info');
+            
             if (status === 'processing') {
                 indicator.style.background = '#f59e0b';
                 indicator.style.animation = 'pulse 1s infinite';
@@ -479,6 +520,8 @@
         }
 
         function addMessage(content, sender, timestamp = new Date()) {
+            debugLog(`💬 Adding ${sender} message: ${content.substring(0, 50)}...`, 'info');
+            
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
             
@@ -498,6 +541,8 @@
         }
 
         function addApprovalButtons(automationSpec) {
+            debugLog('🎯 Adding approval buttons!', 'success');
+            
             const buttonsDiv = document.createElement('div');
             buttonsDiv.className = 'approval-buttons';
             
@@ -518,12 +563,17 @@
             const lastMessage = chatMessages.lastElementChild;
             if (lastMessage && lastMessage.classList.contains('assistant')) {
                 lastMessage.appendChild(buttonsDiv);
+                debugLog('✅ Approval buttons added to last message', 'success');
+            } else {
+                debugLog('❌ Could not find last assistant message for buttons', 'error');
             }
         }
 
         async function sendMessage() {
             const message = chatInput.value.trim();
             if (!message || isProcessing) return;
+
+            debugLog(`📤 Sending message: ${message}`, 'info');
 
             // Add user message to chat
             addMessage(message, 'user');
@@ -533,6 +583,8 @@
             setProcessingState(true);
             
             try {
+                debugLog('🌐 Making fetch request...', 'info');
+                
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
@@ -542,7 +594,7 @@
                         message: message,
                         sessionId: SESSION_ID,
                         conversationHistory: conversationHistory,
-                        userId: 'github_pages_user_' + Date.now()
+                        userId: 'debug_user_' + Date.now()
                     })
                 });
 
@@ -551,23 +603,28 @@
                 }
 
                 const data = await response.json();
-                console.log('Full response:', data);
+                debugLog(`📥 Raw response received (${JSON.stringify(data).length} chars)`, 'success');
                 
                 // Handle Pipedream's nested response format - check multiple possible locations
                 let responseData;
                 if (data.body) {
                     responseData = data.body;
+                    debugLog('📦 Using data.body', 'info');
                 } else if (data.final_response) {
                     responseData = data.final_response;
+                    debugLog('📦 Using data.final_response', 'info');
                 } else if (data.$return_value) {
                     responseData = data.$return_value;
+                    debugLog('📦 Using data.$return_value', 'info');
                 } else if (data.response) {
                     responseData = data.response;
+                    debugLog('📦 Using data.response', 'info');
                 } else {
                     responseData = data;
+                    debugLog('📦 Using raw data', 'info');
                 }
                 
-                console.log('Processed response:', responseData);
+                debugLog(`🔍 Final responseData: ${JSON.stringify(responseData, null, 2)}`, 'info');
                 handleResponse(responseData);
                 
                 // Update conversation history
@@ -577,6 +634,7 @@
                 );
 
             } catch (error) {
+                debugLog(`❌ Error: ${error.message}`, 'error');
                 console.error('Error:', error);
                 addMessage(
                     `<div class="error-message">
@@ -592,7 +650,8 @@
         }
 
         function handleResponse(data) {
-            console.log('Handling response:', data);
+            debugLog(`🔄 Handling response...`, 'info');
+            debugLog(`📊 Response data keys: ${Object.keys(data).join(', ')}`, 'info');
             
             // Add assistant response
             addMessage(data.message, 'assistant');
@@ -602,19 +661,24 @@
             const conversationStep = data.conversation_step || data.conversationStep;
             const automationSpec = data.automation_spec || data.automationSpec;
             
-            console.log('Requires approval:', requiresApproval);
-            console.log('Conversation step:', conversationStep);
+            debugLog(`🎯 Requires approval: ${requiresApproval}`, requiresApproval ? 'success' : 'info');
+            debugLog(`🎯 Conversation step: ${conversationStep}`, 'info');
+            debugLog(`🎯 Has automation spec: ${!!automationSpec}`, 'info');
             
             if (requiresApproval || conversationStep === 'approval_required') {
+                debugLog('✅ APPROVAL FLOW TRIGGERED!', 'success');
                 currentAutomationSpec = automationSpec;
                 addApprovalButtons(automationSpec);
                 updateStatus('ready', 'Awaiting Your Approval');
                 return;
+            } else {
+                debugLog('⚠️ No approval required, checking other steps...', 'info');
             }
             
             // Handle different conversation steps
             switch(conversationStep) {
                 case 'completed':
+                    debugLog('✅ Automation completed!', 'success');
                     if (data.automationCreated || data.automation_created) {
                         const recordId = data.notionRecordId || data.notion_record_id;
                         addMessage(
@@ -630,6 +694,7 @@
                     break;
                 
                 case 'error':
+                    debugLog(`❌ Error response: ${data.error}`, 'error');
                     addMessage(
                         `<div class="error-message">
                             <strong>Processing Error:</strong> ${data.error || 'Unknown error occurred'}
@@ -640,14 +705,17 @@
                     break;
                 
                 case 'scope_redirect':
+                    debugLog('🔄 Scope redirect', 'info');
                     updateStatus('ready', 'Scope Guidance Provided');
                     break;
                 
                 case 'clarification':
+                    debugLog('❓ Clarification needed', 'info');
                     updateStatus('ready', 'Awaiting Clarification');
                     break;
                 
                 default:
+                    debugLog(`🔄 Default case: ${conversationStep || 'undefined'}`, 'info');
                     updateStatus('ready', 'Connected & Ready');
                     break;
             }
@@ -655,6 +723,8 @@
 
         async function approveAutomation(automationSpec) {
             if (isProcessing) return;
+            
+            debugLog('✅ User approved automation!', 'success');
             
             // Remove approval buttons
             const approvalButtons = document.querySelector('.approval-buttons');
@@ -679,7 +749,7 @@
                         approval: true,
                         automationSpec: automationSpec,
                         conversationHistory: conversationHistory,
-                        userId: 'github_pages_user_' + Date.now()
+                        userId: 'debug_user_' + Date.now()
                     })
                 });
 
@@ -688,7 +758,7 @@
                 }
 
                 const data = await response.json();
-                console.log('Full approval response:', data);
+                debugLog('📥 Approval response received', 'success');
                 
                 // Handle Pipedream's nested response format  
                 let responseData;
@@ -704,10 +774,10 @@
                     responseData = data;
                 }
                 
-                console.log('Processed approval response:', responseData);
                 handleResponse(responseData);
 
             } catch (error) {
+                debugLog(`❌ Approval error: ${error.message}`, 'error');
                 console.error('Approval error:', error);
                 addMessage(
                     `<div class="error-message">
@@ -722,6 +792,8 @@
         }
 
         function declineAutomation() {
+            debugLog('❌ User declined automation', 'info');
+            
             // Remove approval buttons
             const approvalButtons = document.querySelector('.approval-buttons');
             if (approvalButtons) {
