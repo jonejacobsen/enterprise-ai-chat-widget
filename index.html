@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise AI Automation Assistant - DEBUG</title>
+    <title>🤖 Enterprise AI Automation Assistant - DEBUG</title>
     <style>
-        /* Keep all your existing CSS - I'm only adding debug styles */
         * {
             margin: 0;
             padding: 0;
@@ -13,578 +12,693 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
-            line-height: 1.6;
-        }
-
-        .debug-panel {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 300px;
-            max-height: 400px;
-            background: #1a1a1a;
-            color: #00ff00;
-            padding: 10px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            overflow-y: auto;
-            z-index: 9999;
-            border: 2px solid #333;
-        }
-
-        .debug-panel h4 {
-            color: #00ffff;
-            margin-bottom: 5px;
-        }
-
-        .debug-entry {
-            margin-bottom: 5px;
-            padding: 2px;
-            border-left: 2px solid #666;
-            padding-left: 5px;
-        }
-
-        .debug-entry.error {
-            border-left-color: #ff0000;
-            color: #ffaaaa;
-        }
-
-        .debug-entry.success {
-            border-left-color: #00ff00;
-            color: #aaffaa;
-        }
-
-        .debug-entry.info {
-            border-left-color: #0088ff;
-            color: #aaccff;
-        }
-
-        /* Your existing styles continue here... */
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        .header h1 {
-            color: #1a1a1a;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .header p {
-            color: #666;
-            font-size: 16px;
         }
 
         .chat-container {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 600px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
-            margin-bottom: 30px;
-            margin-right: 320px; /* Make room for debug panel */
+            position: relative;
+        }
+
+        .debug-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: #2c3e50;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .chat-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 24px;
             text-align: center;
+            position: relative;
         }
 
-        .chat-header h2 {
-            font-size: 20px;
+        .chat-header h1 {
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .status-bar {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 10px;
+        }
+
+        .chat-header p {
             opacity: 0.9;
+            font-size: 14px;
+            line-height: 1.4;
         }
 
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #10b981;
-            animation: pulse 2s infinite;
+        .capabilities {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        .capabilities h3 {
+            color: #e74c3c;
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .capability-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .capability-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: #495057;
+            padding: 4px 0;
+        }
+
+        .capability-item::before {
+            content: "✅";
+            font-size: 12px;
         }
 
         .chat-messages {
-            height: 450px;
+            flex: 1;
+            padding: 24px;
             overflow-y: auto;
-            padding: 20px;
-            background: #f8fafc;
-            scroll-behavior: smooth;
-        }
-
-        .message {
-            margin-bottom: 16px;
-            max-width: 85%;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            margin-left: auto;
-        }
-
-        .message.assistant {
-            margin-right: auto;
-        }
-
-        .message-content {
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .message.user .message-content {
-            background: #667eea;
-            color: white;
-        }
-
-        .message.assistant .message-content {
-            background: white;
-            color: #374151;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .message-timestamp {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 4px;
-            text-align: center;
+            background: #fafbfc;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
         .welcome-message {
-            text-align: center;
-            color: #6b7280;
-            font-style: italic;
-            margin: 60px 20px;
-            padding: 20px;
             background: white;
-            border-radius: 12px;
-            border: 2px dashed #e5e7eb;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #667eea;
         }
 
         .welcome-message h3 {
-            color: #374151;
-            margin-bottom: 12px;
+            color: #667eea;
             font-size: 18px;
-        }
-
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .input-wrapper {
-            position: relative;
-            max-width: 100%;
-        }
-
-        .chat-input {
-            width: 100%;
-            padding: 14px 50px 14px 18px;
-            border: 2px solid #e5e7eb;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.2s ease;
-            resize: none;
-        }
-
-        .chat-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .chat-input:disabled {
-            background: #f3f4f6;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .send-button {
-            position: absolute;
-            right: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 38px;
-            height: 38px;
-            cursor: pointer;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            font-size: 16px;
+            gap: 8px;
         }
 
-        .send-button:hover:not(:disabled) {
-            background: #5a67d8;
-            transform: translateY(-50%) scale(1.05);
+        .welcome-message p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 12px;
         }
 
-        .send-button:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-            transform: translateY(-50%);
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 20px;
-            color: #6b7280;
+        .example {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 8px;
             font-style: italic;
+            color: #1976d2;
+            font-size: 14px;
+            border-left: 3px solid #2196f3;
         }
 
-        .loading.show {
-            display: block;
-            animation: fadeIn 0.3s ease-in;
+        .message {
+            max-width: 85%;
+            padding: 16px 20px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+            position: relative;
+            word-wrap: break-word;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.assistant {
+            background: white;
+            color: #2c3e50;
+            align-self: flex-start;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .approval-section {
+            background: #f8f9fa;
+            border: 2px solid #28a745;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
         }
 
         .approval-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 15px;
+            margin-top: 16px;
             flex-wrap: wrap;
         }
 
-        .approval-button {
-            padding: 12px 20px;
+        .approval-btn {
+            padding: 12px 24px;
             border: none;
-            border-radius: 22px;
-            font-size: 14px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s;
+            font-size: 14px;
             flex: 1;
-            min-width: 160px;
+            min-width: 120px;
         }
 
         .approve-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: #28a745;
             color: white;
         }
 
         .approve-btn:hover {
-            background: linear-gradient(135deg, #059669, #047857);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            background: #218838;
+            transform: translateY(-1px);
         }
 
-        .decline-btn {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
+        .reject-btn {
+            background: #6c757d;
             color: white;
         }
 
-        .decline-btn:hover {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        .reject-btn:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        #messageInput {
+            flex: 1;
+            min-height: 60px;
+            max-height: 200px;
+            padding: 16px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            line-height: 1.4;
+            resize: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fafbfc;
+            overflow-y: auto;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: white;
+        }
+
+        #messageInput::placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .char-count {
+            font-size: 11px;
+            color: #6c757d;
+            text-align: right;
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .char-count.visible {
+            opacity: 1;
+        }
+
+        .char-count.warning {
+            color: #f39c12;
+        }
+
+        .char-count.danger {
+            color: #e74c3c;
+        }
+
+        #sendButton {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            min-width: 80px;
+            height: fit-content;
+        }
+
+        #sendButton:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-style: italic;
+            margin: 12px 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background: #6c757d;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
         }
 
         .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px 16px;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
             border-radius: 8px;
+            border: 1px solid #f5c6cb;
             margin: 12px 0;
-            border-left: 4px solid #ef4444;
-            font-size: 13px;
         }
 
         .success-message {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 12px 16px;
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
             border-radius: 8px;
+            border: 1px solid #c3e6cb;
             margin: 12px 0;
-            border-left: 4px solid #10b981;
-            font-size: 13px;
-        }
-
-        .info-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
-
-        .info-section h3 {
-            color: #1a1a1a;
-            margin-bottom: 15px;
-            font-size: 20px;
-        }
-
-        .info-section ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .info-section li {
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .info-section li:last-child {
-            border-bottom: none;
-        }
-
-        .info-section li::before {
-            content: "✅ ";
-            color: #10b981;
-            font-weight: bold;
         }
 
         .footer {
             text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 14px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .start-conversation-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px 32px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .start-conversation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .connection-status {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 8px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .chat-container {
+                max-width: 100%;
+                min-height: 90vh;
+                border-radius: 12px;
+            }
+
+            .chat-header h1 {
+                font-size: 20px;
+            }
+
+            .chat-messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 92%;
+                padding: 12px 16px;
+            }
+
+            .approval-buttons {
+                flex-direction: column;
+            }
+
+            .approval-btn {
+                min-width: auto;
+            }
+
+            #messageInput {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+        }
+
+        /* Scrollbar Styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        #messageInput::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #messageInput::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        #messageInput::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
-    <!-- DEBUG PANEL -->
-    <div class="debug-panel" id="debugPanel">
-        <h4>🔍 DEBUG CONSOLE</h4>
-        <div id="debugLog"></div>
-    </div>
-
-    <div class="container">
-        <div class="header">
-            <h1>🤖 Enterprise AI Automation Assistant - DEBUG</h1>
+    <div class="chat-container">
+        <div class="debug-badge">DEBUG</div>
+        
+        <div class="chat-header">
+            <h1>🤖 Enterprise AI Automation Assistant</h1>
             <p>Transform your business processes into intelligent automations through natural conversation</p>
         </div>
 
-        <div class="info-section">
+        <div class="capabilities">
             <h3>🎯 What Can I Help You Automate?</h3>
-            <ul>
-                <li>Data synchronization between different tools and platforms</li>
-                <li>Automated notification and alert systems</li>
-                <li>Document processing and routing workflows</li>
-                <li>Report generation and distribution</li>
-                <li>API integrations and webhook connections</li>
-                <li>Scheduled tasks and monitoring systems</li>
-            </ul>
+            <div class="capability-list">
+                <div class="capability-item">Data synchronization between different tools and platforms</div>
+                <div class="capability-item">Automated notification and alert systems</div>
+                <div class="capability-item">Document processing and routing workflows</div>
+                <div class="capability-item">Report generation and distribution</div>
+                <div class="capability-item">API integrations and webhook connections</div>
+                <div class="capability-item">Scheduled tasks and monitoring systems</div>
+            </div>
         </div>
 
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>💬 Start Your Automation Conversation</h2>
-                <div class="status-bar">
-                    <span class="status-indicator"></span>
-                    <span id="statusText">Connected & Ready</span>
+        <div class="chat-messages" id="chatMessages">
+            <button class="start-conversation-btn" onclick="startConversation()">
+                💬 Start Your Automation Conversation
+                <div class="connection-status">Connected & Ready</div>
+            </button>
+
+            <div class="welcome-message" style="display: none;" id="welcomeMessage">
+                <h3>👋 Welcome to DEBUG Mode!</h3>
+                <p><em>I'm here to help you create powerful automations for your business processes.</em></p>
+                <p><strong>Simply describe what you'd like to automate</strong>, and I'll analyze your request, ensure it fits within our automation scope, and guide you through the creation process.</p>
+                <div class="example">
+                    <strong>Example:</strong> "I need to sync my Google Sheets data with Slack notifications daily"
                 </div>
             </div>
 
-            <div class="chat-messages" id="chatMessages">
-                <div class="welcome-message">
-                    <h3>👋 Welcome to DEBUG Mode!</h3>
-                    <p>I'm here to help you create powerful automations for your business processes.</p>
-                    <p><strong>Simply describe what you'd like to automate</strong>, and I'll analyze your request, ensure it fits within our automation scope, and guide you through the creation process.</p>
-                    <p style="margin-top: 15px; font-size: 14px; color: #667eea;">
-                        <strong>Example:</strong> "I need to sync my Google Sheets data with Slack notifications daily"
-                    </p>
+            <div class="typing-indicator" id="typingIndicator">
+                <span>Assistant is thinking</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
                 </div>
             </div>
+        </div>
 
-            <div class="loading" id="loadingIndicator">
-                <div>🤔 Analyzing your automation request...</div>
-            </div>
-
-            <div class="chat-input-container">
-                <div class="input-wrapper">
-                    <input 
-                        type="text" 
-                        class="chat-input" 
-                        id="chatInput" 
-                        placeholder="Describe the automation you need... (e.g., sync data, send notifications, process documents)"
-                        maxlength="500"
-                    >
-                    <button class="send-button" id="sendButton" onclick="sendMessage()">
-                        ▶
-                    </button>
+        <div class="chat-input-container" style="display: none;" id="inputContainer">
+            <div class="input-wrapper">
+                <div style="flex: 1;">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Describe the automation you need... (e.g., 'I need to monitor GitHub repos and send Slack notifications')"
+                        rows="1"
+                    ></textarea>
+                    <div class="char-count" id="charCount">0 characters</div>
                 </div>
+                <button id="sendButton" onclick="sendMessage()">Send</button>
             </div>
         </div>
 
         <div class="footer">
-            <p>Powered by Enterprise AI Automation | Built with ❤️ for streamlined business processes | DEBUG MODE</p>
+            Powered by Enterprise AI Automation | Built with ❤️ for streamlined business processes | <strong>DEBUG MODE</strong>
         </div>
     </div>
 
     <script>
         // Configuration
         const WEBHOOK_URL = 'https://eoih5xh2ah7kwmv.m.pipedream.net';
-        const SESSION_ID = 'debug_session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-        
-        // Debug logging
-        function debugLog(message, type = 'info') {
-            const debugPanel = document.getElementById('debugLog');
-            const entry = document.createElement('div');
-            entry.className = `debug-entry ${type}`;
-            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
-            debugPanel.appendChild(entry);
-            debugPanel.scrollTop = debugPanel.scrollHeight;
-            
-            // Also log to browser console
-            console.log(`[DEBUG] ${message}`);
-        }
-
-        // State management
         let conversationHistory = [];
-        let currentAutomationSpec = null;
-        let isProcessing = false;
+        let currentSessionId = `debug_session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-        // DOM elements
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const statusText = document.getElementById('statusText');
+        // Auto-resize textarea functionality
+        function setupAutoResizeTextarea() {
+            const textarea = document.getElementById('messageInput');
+            if (!textarea) return;
 
-        // Initialize chat
-        document.addEventListener('DOMContentLoaded', function() {
-            debugLog('🚀 Widget initialized', 'success');
-            chatInput.focus();
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey && !isProcessing) {
+            function autoResize() {
+                // Reset height to auto to get the correct scrollHeight
+                textarea.style.height = 'auto';
+                
+                // Set new height based on content, with min/max limits
+                const newHeight = Math.max(60, Math.min(textarea.scrollHeight, 200));
+                textarea.style.height = newHeight + 'px';
+                
+                // Update character count
+                updateCharacterCount();
+            }
+
+            function updateCharacterCount() {
+                const charCount = textarea.value.length;
+                const countDisplay = document.getElementById('charCount');
+                
+                countDisplay.textContent = `${charCount} characters`;
+                
+                // Show/hide based on content length
+                if (charCount > 50) {
+                    countDisplay.classList.add('visible');
+                } else {
+                    countDisplay.classList.remove('visible');
+                }
+                
+                // Color coding for length
+                countDisplay.classList.remove('warning', 'danger');
+                if (charCount > 1000) {
+                    countDisplay.classList.add('danger');
+                } else if (charCount > 500) {
+                    countDisplay.classList.add('warning');
+                }
+            }
+
+            // Event listeners
+            textarea.addEventListener('input', autoResize);
+            textarea.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage();
                 }
             });
-        });
 
-        function updateStatus(status, text) {
-            statusText.textContent = text;
-            const indicator = document.querySelector('.status-indicator');
-            
-            debugLog(`📊 Status update: ${status} - ${text}`, 'info');
-            
-            if (status === 'processing') {
-                indicator.style.background = '#f59e0b';
-                indicator.style.animation = 'pulse 1s infinite';
-            } else if (status === 'error') {
-                indicator.style.background = '#ef4444';
-                indicator.style.animation = 'none';
-            } else {
-                indicator.style.background = '#10b981';
-                indicator.style.animation = 'pulse 2s infinite';
-            }
+            // Initial setup
+            autoResize();
         }
 
-        function addMessage(content, sender, timestamp = new Date()) {
-            debugLog(`💬 Adding ${sender} message: ${content.substring(0, 50)}...`, 'info');
+        function startConversation() {
+            document.getElementById('inputContainer').style.display = 'block';
+            document.getElementById('welcomeMessage').style.display = 'block';
+            document.querySelector('.start-conversation-btn').style.display = 'none';
+            document.getElementById('messageInput').focus();
             
+            // Setup auto-resize after showing the input
+            setupAutoResizeTextarea();
+        }
+
+        function addMessage(content, isUser = false, data = null) {
+            const messagesContainer = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
             
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = content;
+            if (isUser) {
+                messageDiv.textContent = content;
+            } else {
+                // Handle assistant messages with potential approval buttons
+                messageDiv.innerHTML = content;
+                
+                // Add approval buttons if this message requires approval
+                if (data && data.requires_approval && data.automation_spec) {
+                    const approvalSection = document.createElement('div');
+                    approvalSection.className = 'approval-section';
+                    approvalSection.innerHTML = `
+                        <div style="font-weight: 600; color: #28a745; margin-bottom: 12px;">
+                            ⚡ Ready to Create This Automation?
+                        </div>
+                        <div style="font-size: 14px; color: #6c757d; margin-bottom: 16px;">
+                            Review the details above and choose your next step:
+                        </div>
+                        <div class="approval-buttons">
+                            <button class="approval-btn approve-btn" onclick="approveAutomation('${data.sessionId}', ${JSON.stringify(data.automation_spec).replace(/"/g, '&quot;')}, \`${data.message.replace(/`/g, '\\`')}\`)">
+                                ✅ Yes, Create This Automation
+                            </button>
+                            <button class="approval-btn reject-btn" onclick="rejectAutomation('${data.sessionId}')">
+                                ❌ No, Let Me Modify
+                            </button>
+                        </div>
+                    `;
+                    messageDiv.appendChild(approvalSection);
+                }
+            }
             
-            const timestampDiv = document.createElement('div');
-            timestampDiv.className = 'message-timestamp';
-            timestampDiv.textContent = timestamp.toLocaleTimeString();
-            
-            messageDiv.appendChild(contentDiv);
-            messageDiv.appendChild(timestampDiv);
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        function addApprovalButtons(automationSpec) {
-            debugLog('🎯 Adding approval buttons!', 'success');
-            
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.className = 'approval-buttons';
-            
-            const approveBtn = document.createElement('button');
-            approveBtn.className = 'approval-button approve-btn';
-            approveBtn.textContent = '✅ Yes, Create This Automation';
-            approveBtn.onclick = () => approveAutomation(automationSpec);
-            
-            const declineBtn = document.createElement('button');
-            declineBtn.className = 'approval-button decline-btn';
-            declineBtn.textContent = '❌ No, Let Me Refine';
-            declineBtn.onclick = () => declineAutomation();
-            
-            buttonsDiv.appendChild(approveBtn);
-            buttonsDiv.appendChild(declineBtn);
-            
-            // Add to last assistant message
-            const lastMessage = chatMessages.lastElementChild;
-            if (lastMessage && lastMessage.classList.contains('assistant')) {
-                lastMessage.appendChild(buttonsDiv);
-                debugLog('✅ Approval buttons added to last message', 'success');
-            } else {
-                debugLog('❌ Could not find last assistant message for buttons', 'error');
-            }
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function showError(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = `Error: ${message}`;
+            messagesContainer.appendChild(errorDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showSuccess(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = message;
+            messagesContainer.appendChild(successDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
         async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message || isProcessing) return;
-
-            debugLog(`📤 Sending message: ${message}`, 'info');
-
-            // Add user message to chat
-            addMessage(message, 'user');
-            chatInput.value = '';
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = messageInput.value.trim();
             
-            // Update UI state
-            setProcessingState(true);
+            if (!message) return;
+
+            // Disable input and button
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            // Add user message to chat
+            addMessage(message, true);
+            
+            // Clear input and reset height
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            messageInput.style.height = '60px';
+            document.getElementById('charCount').classList.remove('visible');
+            
+            // Show typing indicator
+            showTypingIndicator();
             
             try {
-                debugLog('🌐 Making fetch request...', 'info');
-                
+                console.log('Sending to webhook:', WEBHOOK_URL);
+                console.log('Message:', message);
+                console.log('Session ID:', currentSessionId);
+
                 const response = await fetch(WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
@@ -592,150 +706,52 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        sessionId: SESSION_ID,
+                        sessionId: currentSessionId,
                         conversationHistory: conversationHistory,
-                        userId: 'debug_user_' + Date.now()
+                        timestamp: new Date().toISOString()
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                console.log('Response status:', response.status);
+                const responseData = await response.json();
+                console.log('Response data:', responseData);
 
-                const data = await response.json();
-                debugLog(`📥 Raw response received (${JSON.stringify(data).length} chars)`, 'success');
-                
-                // Handle Pipedream's nested response format - check multiple possible locations
-                let responseData;
-                if (data.body) {
-                    responseData = data.body;
-                    debugLog('📦 Using data.body', 'info');
-                } else if (data.final_response) {
-                    responseData = data.final_response;
-                    debugLog('📦 Using data.final_response', 'info');
-                } else if (data.$return_value) {
-                    responseData = data.$return_value;
-                    debugLog('📦 Using data.$return_value', 'info');
-                } else if (data.response) {
-                    responseData = data.response;
-                    debugLog('📦 Using data.response', 'info');
+                hideTypingIndicator();
+
+                if (responseData.success) {
+                    // Add conversation to history
+                    conversationHistory.push(
+                        { role: 'user', content: message },
+                        { role: 'assistant', content: responseData.message }
+                    );
+
+                    // Add assistant response
+                    addMessage(responseData.message, false, responseData);
+
+                    // Handle different conversation steps
+                    if (responseData.conversation_step === 'completed') {
+                        showSuccess('🎉 <strong>Automation Created Successfully!</strong><br>Your request has been added to the development pipeline.');
+                    }
                 } else {
-                    responseData = data;
-                    debugLog('📦 Using raw data', 'info');
+                    showError(responseData.message || 'Failed to process your request');
                 }
-                
-                debugLog(`🔍 Final responseData: ${JSON.stringify(responseData, null, 2)}`, 'info');
-                handleResponse(responseData);
-                
-                // Update conversation history
-                conversationHistory.push(
-                    { role: 'user', content: message },
-                    { role: 'assistant', content: responseData.message }
-                );
 
             } catch (error) {
-                debugLog(`❌ Error: ${error.message}`, 'error');
                 console.error('Error:', error);
-                addMessage(
-                    `<div class="error-message">
-                        <strong>Connection Error:</strong> Unable to process your request. Please check your connection and try again.
-                        <br><small>If the problem persists, the Pipedream workflow may need to be configured.</small>
-                    </div>`, 
-                    'assistant'
-                );
-                updateStatus('error', 'Connection Error');
+                hideTypingIndicator();
+                showError('Connection error. Please check your connection and try again.');
             } finally {
-                setProcessingState(false);
+                // Re-enable input and button
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                messageInput.focus();
             }
         }
 
-        function handleResponse(data) {
-            debugLog(`🔄 Handling response...`, 'info');
-            debugLog(`📊 Response data keys: ${Object.keys(data).join(', ')}`, 'info');
+        async function approveAutomation(sessionId, automationSpec, approvalMessage) {
+            console.log('Approving automation:', { sessionId, automationSpec, approvalMessage });
             
-            // Add assistant response
-            addMessage(data.message, 'assistant');
-            
-            // Check for approval requirement (handle both field name formats)
-            const requiresApproval = data.requires_approval || data.requiresApproval;
-            const conversationStep = data.conversation_step || data.conversationStep;
-            const automationSpec = data.automation_spec || data.automationSpec;
-            
-            debugLog(`🎯 Requires approval: ${requiresApproval}`, requiresApproval ? 'success' : 'info');
-            debugLog(`🎯 Conversation step: ${conversationStep}`, 'info');
-            debugLog(`🎯 Has automation spec: ${!!automationSpec}`, 'info');
-            
-            if (requiresApproval || conversationStep === 'approval_required') {
-                debugLog('✅ APPROVAL FLOW TRIGGERED!', 'success');
-                currentAutomationSpec = automationSpec;
-                addApprovalButtons(automationSpec);
-                updateStatus('ready', 'Awaiting Your Approval');
-                return;
-            } else {
-                debugLog('⚠️ No approval required, checking other steps...', 'info');
-            }
-            
-            // Handle different conversation steps
-            switch(conversationStep) {
-                case 'completed':
-                    debugLog('✅ Automation completed!', 'success');
-                    if (data.automationCreated || data.automation_created) {
-                        const recordId = data.notionRecordId || data.notion_record_id;
-                        addMessage(
-                            `<div class="success-message">
-                                <strong>🎉 Automation Request Created Successfully!</strong><br>
-                                ${recordId ? `Reference ID: ${recordId}<br>` : ''}
-                                <small>Your automation will be built and deployed within 2-5 business days.</small>
-                            </div>`, 
-                            'assistant'
-                        );
-                        updateStatus('ready', 'Automation Created Successfully!');
-                    }
-                    break;
-                
-                case 'error':
-                    debugLog(`❌ Error response: ${data.error}`, 'error');
-                    addMessage(
-                        `<div class="error-message">
-                            <strong>Processing Error:</strong> ${data.error || 'Unknown error occurred'}
-                        </div>`, 
-                        'assistant'
-                    );
-                    updateStatus('error', 'Processing Error');
-                    break;
-                
-                case 'scope_redirect':
-                    debugLog('🔄 Scope redirect', 'info');
-                    updateStatus('ready', 'Scope Guidance Provided');
-                    break;
-                
-                case 'clarification':
-                    debugLog('❓ Clarification needed', 'info');
-                    updateStatus('ready', 'Awaiting Clarification');
-                    break;
-                
-                default:
-                    debugLog(`🔄 Default case: ${conversationStep || 'undefined'}`, 'info');
-                    updateStatus('ready', 'Connected & Ready');
-                    break;
-            }
-        }
-
-        async function approveAutomation(automationSpec) {
-            if (isProcessing) return;
-            
-            debugLog('✅ User approved automation!', 'success');
-            
-            // Remove approval buttons
-            const approvalButtons = document.querySelector('.approval-buttons');
-            if (approvalButtons) {
-                approvalButtons.remove();
-            }
-            
-            // Add approval message
-            addMessage('✅ Yes, please create this automation!', 'user');
-            
-            setProcessingState(true);
+            showTypingIndicator();
             
             try {
                 const response = await fetch(WEBHOOK_URL, {
@@ -745,91 +761,46 @@
                     },
                     body: JSON.stringify({
                         message: 'User approved the automation',
-                        sessionId: SESSION_ID,
+                        sessionId: sessionId,
                         approval: true,
                         automationSpec: automationSpec,
+                        approvalMessage: approvalMessage,
                         conversationHistory: conversationHistory,
-                        userId: 'debug_user_' + Date.now()
+                        timestamp: new Date().toISOString()
                     })
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                const responseData = await response.json();
+                console.log('Approval response:', responseData);
 
-                const data = await response.json();
-                debugLog('📥 Approval response received', 'success');
-                
-                // Handle Pipedream's nested response format  
-                let responseData;
-                if (data.body) {
-                    responseData = data.body;
-                } else if (data.final_response) {
-                    responseData = data.final_response;
-                } else if (data.$return_value) {
-                    responseData = data.$return_value;
-                } else if (data.response) {
-                    responseData = data.response;
+                hideTypingIndicator();
+
+                if (responseData.success) {
+                    addMessage(responseData.message, false, responseData);
+                    if (responseData.automation_created) {
+                        showSuccess(`🎉 <strong>Automation Created!</strong><br>Reference ID: ${responseData.notion_record_id}`);
+                    }
                 } else {
-                    responseData = data;
+                    showError(responseData.message || 'Failed to create automation');
                 }
-                
-                handleResponse(responseData);
 
             } catch (error) {
-                debugLog(`❌ Approval error: ${error.message}`, 'error');
                 console.error('Approval error:', error);
-                addMessage(
-                    `<div class="error-message">
-                        <strong>Error:</strong> Failed to process approval. Please try again.
-                    </div>`, 
-                    'assistant'
-                );
-                updateStatus('error', 'Approval Failed');
-            } finally {
-                setProcessingState(false);
+                hideTypingIndicator();
+                showError('Failed to process approval. Please try again.');
             }
         }
 
-        function declineAutomation() {
-            debugLog('❌ User declined automation', 'info');
-            
-            // Remove approval buttons
-            const approvalButtons = document.querySelector('.approval-buttons');
-            if (approvalButtons) {
-                approvalButtons.remove();
-            }
-            
-            addMessage('❌ Let me refine my requirements', 'user');
-            addMessage('No problem! Please tell me more about what you\'d like to change or clarify about your automation needs.', 'assistant');
-            
-            currentAutomationSpec = null;
-            updateStatus('ready', 'Ready for Refinement');
+        function rejectAutomation(sessionId) {
+            addMessage("I'd like to modify the automation details. Could you help me refine the requirements?", true);
+            // The user can now send a new message with modifications
         }
 
-        function setProcessingState(processing) {
-            isProcessing = processing;
-            chatInput.disabled = processing;
-            sendButton.disabled = processing;
-            
-            if (processing) {
-                loadingIndicator.classList.add('show');
-                updateStatus('processing', 'Processing Your Request...');
-                chatInput.placeholder = 'Please wait...';
-            } else {
-                loadingIndicator.classList.remove('show');
-                updateStatus('ready', 'Connected & Ready');
-                chatInput.placeholder = 'Describe the automation you need...';
-                chatInput.focus();
-            }
-        }
-
-        // Add some helpful keyboard shortcuts
-        document.addEventListener('keydown', function(e) {
-            // Focus input when typing (unless in input already)
-            if (e.target !== chatInput && e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
-                chatInput.focus();
-            }
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Chat widget initialized');
+            console.log('Webhook URL:', WEBHOOK_URL);
+            console.log('Session ID:', currentSessionId);
         });
     </script>
 </body>
