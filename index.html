@@ -243,40 +243,42 @@
         .approval-buttons {
             display: flex;
             gap: 12px;
-            margin-top: 12px;
+            margin-top: 15px;
             flex-wrap: wrap;
         }
 
         .approval-button {
-            padding: 10px 18px;
+            padding: 12px 20px;
             border: none;
             border-radius: 22px;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             flex: 1;
-            min-width: 140px;
+            min-width: 160px;
         }
 
         .approve-btn {
-            background: #10b981;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
         }
 
         .approve-btn:hover {
-            background: #059669;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #059669, #047857);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .decline-btn {
-            background: #ef4444;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
         }
 
         .decline-btn:hover {
-            background: #dc2626;
-            transform: translateY(-1px);
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .error-message {
@@ -357,7 +359,12 @@
             .approval-button {
                 min-width: 120px;
                 font-size: 12px;
-                padding: 8px 14px;
+                padding: 10px 16px;
+                flex-direction: column;
+            }
+            
+            .approval-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -544,9 +551,22 @@
                 }
 
                 const data = await response.json();
-                // Handle Pipedream's nested response format
-                const responseData = data.response || data.$return_value || data;
-                console.log('Raw response:', data);
+                console.log('Full response:', data);
+                
+                // Handle Pipedream's nested response format - check multiple possible locations
+                let responseData;
+                if (data.body) {
+                    responseData = data.body;
+                } else if (data.final_response) {
+                    responseData = data.final_response;
+                } else if (data.$return_value) {
+                    responseData = data.$return_value;
+                } else if (data.response) {
+                    responseData = data.response;
+                } else {
+                    responseData = data;
+                }
+                
                 console.log('Processed response:', responseData);
                 handleResponse(responseData);
                 
@@ -577,20 +597,30 @@
             // Add assistant response
             addMessage(data.message, 'assistant');
             
+            // Check for approval requirement (handle both field name formats)
+            const requiresApproval = data.requires_approval || data.requiresApproval;
+            const conversationStep = data.conversation_step || data.conversationStep;
+            const automationSpec = data.automation_spec || data.automationSpec;
+            
+            console.log('Requires approval:', requiresApproval);
+            console.log('Conversation step:', conversationStep);
+            
+            if (requiresApproval || conversationStep === 'approval_required') {
+                currentAutomationSpec = automationSpec;
+                addApprovalButtons(automationSpec);
+                updateStatus('ready', 'Awaiting Your Approval');
+                return;
+            }
+            
             // Handle different conversation steps
-            switch(data.conversationStep) {
-                case 'approval_required':
-                    currentAutomationSpec = data.automationSpec;
-                    addApprovalButtons(data.automationSpec);
-                    updateStatus('ready', 'Awaiting Your Approval');
-                    break;
-                
+            switch(conversationStep) {
                 case 'completed':
-                    if (data.automationCreated) {
+                    if (data.automationCreated || data.automation_created) {
+                        const recordId = data.notionRecordId || data.notion_record_id;
                         addMessage(
                             `<div class="success-message">
                                 <strong>🎉 Automation Request Created Successfully!</strong><br>
-                                Reference ID: ${data.notionRecordId}<br>
+                                ${recordId ? `Reference ID: ${recordId}<br>` : ''}
                                 <small>Your automation will be built and deployed within 2-5 business days.</small>
                             </div>`, 
                             'assistant'
@@ -607,6 +637,14 @@
                         'assistant'
                     );
                     updateStatus('error', 'Processing Error');
+                    break;
+                
+                case 'scope_redirect':
+                    updateStatus('ready', 'Scope Guidance Provided');
+                    break;
+                
+                case 'clarification':
+                    updateStatus('ready', 'Awaiting Clarification');
                     break;
                 
                 default:
@@ -636,18 +674,37 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        message: 'APPROVAL_CONFIRMED',
+                        message: 'User approved the automation',
                         sessionId: SESSION_ID,
                         approval: true,
                         automationSpec: automationSpec,
-                        conversationHistory: conversationHistory
+                        conversationHistory: conversationHistory,
+                        userId: 'github_pages_user_' + Date.now()
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const data = await response.json();
+                console.log('Full approval response:', data);
+                
                 // Handle Pipedream's nested response format  
-                const responseData = data.response || data.$return_value || data;
-                console.log('Approval response:', responseData);
+                let responseData;
+                if (data.body) {
+                    responseData = data.body;
+                } else if (data.final_response) {
+                    responseData = data.final_response;
+                } else if (data.$return_value) {
+                    responseData = data.$return_value;
+                } else if (data.response) {
+                    responseData = data.response;
+                } else {
+                    responseData = data;
+                }
+                
+                console.log('Processed approval response:', responseData);
                 handleResponse(responseData);
 
             } catch (error) {
