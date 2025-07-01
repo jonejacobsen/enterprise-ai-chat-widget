@@ -544,7 +544,10 @@
                 }
 
                 const data = await response.json();
-                handleResponse(data);
+                
+                // Handle both direct response and wrapped response formats
+                const responseData = data.response || data.$return_value || data;
+                handleResponse(responseData);
                 
                 // Update conversation history
                 conversationHistory.push(
@@ -639,7 +642,8 @@
                 });
 
                 const data = await response.json();
-                handleResponse(data);
+                const responseData = data.response || data.$return_value || data;
+                handleResponse(responseData);
 
             } catch (error) {
                 console.error('Approval error:', error);
