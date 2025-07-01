@@ -544,15 +544,16 @@
                 }
 
                 const data = await response.json();
-                
-                // Handle both direct response and wrapped response formats
+                // Handle Pipedream's nested response format
                 const responseData = data.response || data.$return_value || data;
+                console.log('Raw response:', data);
+                console.log('Processed response:', responseData);
                 handleResponse(responseData);
                 
                 // Update conversation history
                 conversationHistory.push(
                     { role: 'user', content: message },
-                    { role: 'assistant', content: data.message }
+                    { role: 'assistant', content: responseData.message }
                 );
 
             } catch (error) {
@@ -571,6 +572,8 @@
         }
 
         function handleResponse(data) {
+            console.log('Handling response:', data);
+            
             // Add assistant response
             addMessage(data.message, 'assistant');
             
@@ -642,7 +645,9 @@
                 });
 
                 const data = await response.json();
+                // Handle Pipedream's nested response format  
                 const responseData = data.response || data.$return_value || data;
+                console.log('Approval response:', responseData);
                 handleResponse(responseData);
 
             } catch (error) {
